@@ -25,10 +25,27 @@ public class ApiGatewayAuthentication {
 		http
 		.csrf(csrf -> csrf.disable())
 		.authorizeExchange(exchange -> exchange
-				.pathMatchers(HttpMethod.POST).hasRole("ADMIN")
 				.pathMatchers("/currency-exchange").permitAll()
-				.pathMatchers("/currency-conversion").hasRole("USER")
-				.pathMatchers("/users").hasRole("ADMIN")
+				.pathMatchers("/currency-conversion-feign").hasRole("USER")
+				.pathMatchers(HttpMethod.GET, "/users").hasAnyRole("ADMIN", "OWNER")
+				.pathMatchers(HttpMethod.POST, "/users/newUser").hasAnyRole("OWNER", "ADMIN")
+				.pathMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("OWNER")
+				.pathMatchers(HttpMethod.PUT, "/users/{id}").hasAnyRole("OWNER", "ADMIN")
+				.pathMatchers(HttpMethod.POST, "/bank-accounts").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/bank-accounts").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.PUT, "/bank-accounts/{email}").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/bank-accounts/{email}").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/bank-account/user").hasRole("USER")
+				.pathMatchers(HttpMethod.DELETE, "/bank-accounts/{email}").denyAll()
+				.pathMatchers("/crypto-exchange").permitAll()
+				.pathMatchers(HttpMethod.POST, "/crypto-wallets").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/crypto-wallets").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.PUT, "/crypto-wallets/{email}").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/crypto-wallets/{email}").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.GET, "/crypto-wallet/user").hasRole("USER")
+				.pathMatchers(HttpMethod.DELETE, "/crypto-wallets/{email}").denyAll()
+				.pathMatchers("/crypto-conversion-feign").hasRole("USER")
+				.pathMatchers("/trade-service").hasRole("USER")
 				).httpBasic(Customizer.withDefaults());
 		
 		return http.build();
